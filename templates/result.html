@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Results</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            color: #2d3748;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            margin-top: 2rem;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #4a90e2 0%, #845ec2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .image-section {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .analyzed-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            object-fit: contain;
+            max-height: 300px;
+        }
+
+        .result-section {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            padding: 2rem;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .result-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .result-value {
+            font-size: 1.4rem;
+            color: #2d3748;
+            font-weight: 600;
+            padding: 0.5rem;
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 8px;
+            margin-top: 0.5rem;
+        }
+
+        .emotion-happy {
+            color: #38a169;
+        }
+
+        .emotion-sad {
+            color: #e53e3e;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #4a90e2 0%, #845ec2 100%);
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .prediction-value {
+            font-size: 2rem;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(74, 144, 226, 0.1);
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Analysis Results</h1>
+        
+        <div class="result-grid">
+            <div class="image-section">
+                <!-- Using data URL for direct image display -->
+                <img 
+                    src="data:image/jpeg;base64,{{ imgPath | pil_to_b64 }}" 
+                    alt="Analyzed Image" 
+                    class="analyzed-image"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                >
+                <p style="display: none;">Image could not be displayed</p>
+            </div>
+            
+            <div class="result-section">
+                <div class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-brain"></i>
+                        Prediction Score
+                    </div>
+                    <div class="prediction-value">
+                        {{ "%.2f"|format(prediction) }}
+                    </div>
+                </div>
+
+                <div class="result-card">
+                    <div class="result-title">
+                        <i class="fas fa-heart"></i>
+                        Detected Emotion
+                    </div>
+                    <div class="result-value {% if emotions == 'Happy' %}emotion-happy{% else %}emotion-sad{% endif %}">
+                        <i class="fas {% if emotions == 'Happy' %}fa-smile{% else %}fa-frown{% endif %}"></i>
+                        {{ emotions }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="/" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+            Try Another Image
+        </a>
+    </div>
+</body>
+</html>

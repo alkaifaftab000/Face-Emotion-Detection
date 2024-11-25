@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Classifier</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            color: #2d3748;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin-top: 2rem;
+        }
+
+        .credits {
+            text-align: center;
+            margin-top: 2rem;
+            color: #718096;
+            font-size: 0.9rem;
+            font-style: italic;
+            background: linear-gradient(135deg, #4a90e2 0%, #845ec2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            padding: 0.5rem;
+            border-top: 1px solid rgba(74, 144, 226, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #4a90e2 0%, #845ec2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 2rem;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .upload-area {
+            width: 100%;
+            min-height: 200px;
+            border: 3px dashed #cbd5e0;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            border-color: #4a90e2;
+            background: rgba(74, 144, 226, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #4a90e2;
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            text-align: center;
+            color: #718096;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #4a90e2 0%, #845ec2 100%);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            width: 100%;
+            max-width: 200px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .upload-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .option-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 2px solid #4a90e2;
+            border-radius: 8px;
+            background: white;
+            color: #4a90e2;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .option-btn:hover {
+            background: #4a90e2;
+            color: white;
+        }
+
+        #camera-container {
+            width: 100%;
+            max-width: 100%;
+            display: none;
+            margin-top: 1rem;
+        }
+
+        #camera-feed {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .camera-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Face Emotion Detector</h1>
+        <p class="subtitle">Upload an image or take a photo and let AI analyze it</p>
+        
+        <form action="/predict" method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                <p class="upload-text">Drag and drop your image here<br>or click to browse</p>
+                <div class="upload-options">
+                    <button type="button" class="option-btn" onclick="startCamera(event)">
+                        <i class="fas fa-camera"></i>
+                        Take Photo
+                    </button>
+                </div>
+                <input type="file" id="fileInput" name="image" accept="image/*" required onchange="previewImage(this)">
+            </div>
+            
+            <div id="camera-container">
+                <video id="camera-feed" autoplay playsinline></video>
+                <div class="camera-controls">
+                    <button type="button" class="option-btn" onclick="capturePhoto()">
+                        <i class="fas fa-camera"></i>
+                        Capture
+                    </button>
+                    <button type="button" class="option-btn" onclick="stopCamera()">
+                        <i class="fas fa-times"></i>
+                        Close
+                    </button>
+                </div>
+            </div>
+            
+            <img id="imagePreview" alt="Preview">
+            
+            <button type="submit" class="submit-btn">
+                Analyze Image
+            </button>
+        </form>
+
+        <div class="credits">
+            Designed and Analysis by Manam, Alkaif, Labhanshu
+        </div>
+    </div>
+
+    <script>
+        let stream = null;
+
+        function previewImage(input) {
+            const preview = document.getElementById('imagePreview');
+            const file = input.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        }
+
+        async function startCamera(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                
+                const videoElement = document.getElementById('camera-feed');
+                videoElement.srcObject = stream;
+                document.getElementById('camera-container').style.display = 'block';
+                document.getElementById('imagePreview').style.display = 'none';
+            } catch (err) {
+                console.error('Error accessing camera:', err);
+                alert('Unable to access camera. Please make sure you have granted camera permissions.');
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            document.getElementById('camera-container').style.display = 'none';
+        }
+
+        function capturePhoto() {
+            const videoElement = document.getElementById('camera-feed');
+            const canvas = document.createElement('canvas');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            
+            const context = canvas.getContext('2d');
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+            
+            canvas.toBlob((blob) => {
+                const file = new File([blob], "camera-capture.jpg", { type: "image/jpeg" });
+                
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                
+                document.getElementById('fileInput').files = dataTransfer.files;
+                
+                const preview = document.getElementById('imagePreview');
+                preview.src = canvas.toDataURL('image/jpeg');
+                preview.style.display = 'block';
+                
+                stopCamera();
+            }, 'image/jpeg');
+        }
+
+        const uploadArea = document.querySelector('.upload-area');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            uploadArea.style.borderColor = '#4a90e2';
+            uploadArea.style.background = 'rgba(74, 144, 226, 0.05)';
+        }
+
+        function unhighlight(e) {
+            uploadArea.style.borderColor = '#cbd5e0';
+            uploadArea.style.background = 'transparent';
+        }
+
+        uploadArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            const fileInput = document.getElementById('fileInput');
+            
+            fileInput.files = files;
+            previewImage(fileInput);
+        }
+    </script>
+</body>
+</html>
