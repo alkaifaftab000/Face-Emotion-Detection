@@ -3,13 +3,10 @@ services:
     name: face-emotion-detection
     env: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn wsgi:app
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT  # Updated to bind to PORT
     plan: free
     envVars:
       - key: PORT
         value: 5000
       - key: TF_CPP_MIN_LOG_LEVEL
         value: 2
-      # Add other environment variables here if needed
-      # - key: NAME_OF_VARIABLE
-      #   value: value
