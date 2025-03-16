@@ -8,8 +8,8 @@ services:
     envVars:
       - key: PORT
         value: 5000
-      - key: TF_CPP_MIN_LOG_LEVEL  # Add this to suppress the TensorRT warning
-        value: 2                   # 2 hides INFO and WARNING messages
+      - key: TF_CPP_MIN_LOG_LEVEL
+        value: 2
       # Add other environment variables here if needed
       # - key: NAME_OF_VARIABLE
       #   value: value

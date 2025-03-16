@@ -38,16 +38,15 @@ def predict():
                 return "No file uploaded"
 
             # Process image
-            img = Image.open(file.stream)
-            resize = tf.image.resize(img, (256,256))
+            img = Image.open(file.stream).convert('RGB')  # Ensure image is in RGB format
+            img = img.resize((256, 256))  # Resize using PIL
+            img_array = np.array(img) / 255.0  # Normalize pixel values
 
             # Make prediction
-            prediction = model.predict(np.expand_dims(resize/255, 0))
-            emotions = 'Happy'
-            if prediction > 0.5:
-                emotions = 'Sad'
+            prediction = model.predict(np.expand_dims(img_array, axis=0))
+            emotions = 'Happy' if prediction[0] > 0.5 else 'Sad'
             
-            return render_template('result.html', prediction=prediction[0],emotions=emotions,imgPath = img)
+            return render_template('result.html', prediction=prediction[0], emotions=emotions, imgPath=img)
 
         except Exception as e:
             return f"Error processing image: {e}"
