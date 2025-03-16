@@ -22,7 +22,7 @@ def pil_to_b64(pil_img):
     base64_str = base64.b64encode(byte_data).decode('utf-8')
     return base64_str
 
-model = keras.models.load_model('model\imageclassifier_keras3.h5')
+model = keras.models.load_model('model/imageclassifier_keras3.h5')
 model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
 @app.route('/')
