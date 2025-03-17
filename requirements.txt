@@ -1,5 +1,6 @@
-flask==3.0.2
-tensorflow==2.18.0
+# should have python 3.10 for tflite-runtime
+flask==2.1.2
+tflite-runtime==2.10.0
 pillow==10.2.0
-numpy==1.26.4
-gunicorn==21.2.0
+numpy==1.23.5
+gunicorn==20.1.0
