@@ -1,6 +1,6 @@
 # should have python 3.10 for tflite-runtime
 flask==2.1.2
-tflite-runtime==2.10.0
+tflite-runtime==2.14.0
 pillow==10.2.0
 numpy==1.23.5
 gunicorn==20.1.0
