@@ -23,8 +23,8 @@ This project aims to detect emotions (happy or sad) from images using deep learn
         - Flatten  
       - Small filters in Conv2D to extract intricate features.  
    - The model outputs a score:  
-      - Close to `1`: Person is sad 😢  
-      - Close to `0`: Person is happy 😃
+      - Close to `0`: Person is sad 😢  
+      - Close to `1`: Person is happy 😃
 
 ---
 
